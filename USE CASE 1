@@ -1,0 +1,53 @@
+graph = {
+    'A': {'B': 6, 'F': 3},
+    'B': {'A': 6, 'C': 3, 'D': 2},
+    'C': {'B': 3, 'D': 1, 'E': 5},
+    'D': {'B': 2, 'C': 1, 'E': 8},
+    'E': {'C': 5, 'D': 8},
+    'F': {'A': 3, 'G': 1, 'H': 7},
+    'G': {'F': 1, 'H': 2},
+    'H': {'F': 7, 'G': 2, 'E': 3}
+}
+heuristic = {
+    'A': 10,
+    'B': 8,
+    'C': 5,
+    'D': 7,
+    'E': 0,
+    'F': 6,
+    'G': 5,
+    'H': 3
+}
+def a_star_search(start, goal):
+    open_list = {start: 0}     
+    closed_list = set()
+    parent = {start: None}
+    while open_list:
+        current = min(open_list, key=lambda node: open_list[node] + heuristic[node])
+        print(f"\nVisiting node: {current}")
+        if current == goal:
+            path = []
+            while current:
+                path.append(current)
+                current = parent[current]
+            return path[::-1]
+        current_cost = open_list[current]
+        closed_list.add(current)
+        del open_list[current]
+        for neighbor, cost in graph[current].items():
+            if neighbor in closed_list:
+                continue
+            new_cost = current_cost + cost
+            if neighbor not in open_list or new_cost < open_list[neighbor]:
+                open_list[neighbor] = new_cost
+                parent[neighbor] = current
+                print(f"  Added/Updated: {neighbor} (g={new_cost}, h={heuristic[neighbor]}, f={new_cost + heuristic[neighbor]})")
+    return None
+start = 'A'
+goal = 'E'
+path = a_star_search(start, goal)
+if path:
+    print("\nShortest Path Found:")
+    print(" → ".join(path))
+else:
+    print("No path found!")
